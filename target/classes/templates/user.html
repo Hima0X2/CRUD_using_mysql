@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+        .add-button {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+        /* Form Styles */
+        #addForm {
+            display: none;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            width: 60%;
+        }
+        #addForm label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        #addForm input[type="text"],
+        #addForm input[type="email"],
+        #addForm input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        #addForm input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .confirmation-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        .confirm-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .confirm-buttons button {
+            margin: 0 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .confirm-buttons .confirm {
+            background-color: #007BFF;
+            color: white;
+        }
+        .confirm-buttons .cancel {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Students Information</h1>
+    <button class="add-button" onclick="toggleForm()">Add Student Information</button>
+    
+    <div id="addForm" style="display: none;">
+       <form action="/addStudent" method="post">
+            <label for="firstname">First Name:</label>
+            <input type="text" id="firstname" name="firstname" required><br><br>
+            <label for="lastname">Last Name:</label>
+            <input type="text" id="lastname" name="lastname" required><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Display student data -->
+            <tr th:each="student : ${students}">
+                <td th:text="${student.id}"></td>
+                <td th:text="${student.firstname}"></td>
+                <td th:text="${student.lastname}"></td>
+                <td th:text="${student.email}"></td>
+     <td>
+     <a class="button edit-button" th:href="@{/editStudent/{id}(id=${student.id})}">Edit</a>
+    </td>
+        <td>
+    <button class="button delete-button" th:onclick="'confirmDelete(' + ${student.id} + ')'">Delete</button>
+</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Confirmation dialog -->
+    <div id="confirmDialog" class="confirmation-dialog">
+        <p>Are you sure you want to delete this student?</p>
+        <div class="confirm-buttons">
+            <form id="deleteForm" action="" method="post">
+                <input type="hidden" id="deleteId" name="deleteId">
+                <button type="submit" class="confirm">Yes</button>
+                <button type="button" class="cancel" onclick="closeDialog()">No</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function toggleForm() {
+            var form = document.getElementById('addForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        function confirmDelete(studentId) {
+            console.log('Student ID:', studentId); // Debugging log
+
+            var dialog = document.getElementById('confirmDialog');
+            var deleteForm = document.getElementById('deleteForm');
+            var deleteId = document.getElementById('deleteId');
+
+            deleteId.value = studentId; // Directly assign the integer value
+            deleteForm.action = '/deleteStudent/' + studentId;
+
+            // Show the confirmation dialog
+            dialog.style.display = 'block';
+        }
+
+        function closeDialog() {
+            var dialog = document.getElementById('confirmDialog');
+            dialog.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
