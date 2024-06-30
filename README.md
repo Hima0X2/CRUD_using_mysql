@@ -1,4 +1,4 @@
-# CRUD_using_postgresql
+# CRUD_using_Mysql
 
 It is a Spring Boot application for managing student details.
 
