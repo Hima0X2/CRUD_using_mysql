@@ -20,7 +20,7 @@ It is a Spring Boot application for managing student details.
 Before running the application, make sure you have the following installed:
 
 - Java Development Kit (JDK)
-- PostgreSQL database
+- MySQL database
 - Maven
 
 ## Setup
