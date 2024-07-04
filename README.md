@@ -66,7 +66,7 @@ Before running the application, make sure you have the following installed:
 
 5. **Access the application:**
 
-   Open your web browser and go to http://localhost:8080/students to access the application.
+   Open your web browser and go to http://192.168.159.1:8080/students to access the application.
 
 ## Contributing
 
